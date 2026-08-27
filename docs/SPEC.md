@@ -299,21 +299,36 @@ Listed so that "it doesn't do that" is never a surprise:
 
 Recorded for completeness. You do not need to act on these.
 
-- **Backend:** Python with FastAPI
-- **Database:** PostgreSQL — chosen deliberately. This system's job is to never
-  lose or mangle money, and PostgreSQL guarantees that a payment and its ledger
-  entry either both save or neither does. That guarantee is the whole reason to
-  prefer it here.
-- **Frontend:** React, laid out to work on a phone as well as a desktop
-- **Money:** stored as whole minor units, single currency
-- **Every change to money is recorded with the user who made it**
+- **Application:** Next.js (React + TypeScript), deployed on Vercel.
+  *This replaces the FastAPI + separate React app named in Draft 1.* Every
+  project in your account is already on Vercel, and Vercel does not host Python
+  backends well. Running one would have meant a second hosting provider, a second
+  bill, and a second thing that can break. Next.js puts the screens and the rules
+  in one application, on hosting you already have. No behaviour described in this
+  document changes as a result.
+- **Database:** PostgreSQL, in the existing "Peace Valley Academy" Supabase
+  project, chosen over a new $10/month project at your instruction. Every table
+  here carries an `am_` prefix and sits alongside the unrelated `it_` lesson
+  tracker already in that database — which is that database's own convention.
+- **Security:** every rule about who may see what is enforced by PostgreSQL
+  itself, through row level security — not by the screens. Hiding a button is not
+  security; a rule in the database is. The application holds no secret key able
+  to bypass those rules: it only ever queries as the signed-in person.
+- **Accounts:** nobody reaches this system unless the owner invites their email
+  address first. An uninvited account gets no access at all. This matters more
+  than usual here, because the sign-in pool is shared with the lesson tracker.
+- **Money:** stored as whole minor units, single currency.
 
 `[ASSUMPTION X1]` Single currency throughout.
-`[ASSUMPTION X2]` This runs as a website you and your staff reach over the
-internet, on phone or laptop — not a program installed on one office computer.
-
----
+`[ASSUMPTION X2]` A website you and your staff reach over the internet, on phone
+or laptop — not a program installed on one office computer.
+`[ASSUMPTION X3]` Currency defaults to CAD, changeable in Settings. I had to pick
+something; question 2 settles it properly.
 
 ## Change log
 
 - **Draft 1** — initial specification, from the first requirements conversation.
+- **Draft 2** — phase 1 built. Stack changed from FastAPI + React to Next.js
+  (§10). Database settled: the existing Supabase project, tables prefixed `am_`,
+  with row level security verified per role. Parent portal confirmed out of
+  version 1.
